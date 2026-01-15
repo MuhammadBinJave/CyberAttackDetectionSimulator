@@ -1,0 +1,130 @@
+import java.util.*;
+
+class LogEntry {
+    String ip;
+    String activity;
+
+    LogEntry(String ip, String activity) {
+        this.ip = ip;
+        this.activity = activity;
+    }
+}
+
+public class CyberAttackDetectionSimulator {
+
+    static Queue<LogEntry> logQueue = new LinkedList<>();
+    static Stack<LogEntry> suspiciousStack = new Stack<>();
+    static HashSet<String> blacklistedIPs = new HashSet<>();
+    static ArrayList<LogEntry> allLogs = new ArrayList<>();
+    static Scanner sc = new Scanner(System.in);
+
+    public static void main(String[] args) {
+
+        int choice;
+
+        do {
+            System.out.println("\n--- Cyber Attack Detection Simulator ---");
+            System.out.println("1. Add Network Log");
+            System.out.println("2. Detect Suspicious Activity");
+            System.out.println("3. View Pending Logs");
+            System.out.println("4. View Suspicious Activities");
+            System.out.println("5. Search IP Address");
+            System.out.println("6. Exit");
+            System.out.print("Enter choice: ");
+
+            choice = sc.nextInt();
+            sc.nextLine();
+
+            switch (choice) {
+                case 1:
+                    addLog();
+                    break;
+                case 2:
+                    detectAttack();
+                    break;
+                case 3:
+                    viewLogs();
+                    break;
+                case 4:
+                    viewSuspicious();
+                    break;
+                case 5:
+                    searchIP();
+                    break;
+                case 6:
+                    System.out.println("Exiting...");
+                    break;
+                default:
+                    System.out.println("Invalid choice");
+            }
+
+        } while (choice != 6);
+    }
+
+    static void addLog() {
+        System.out.print("Enter IP Address: ");
+        String ip = sc.nextLine();
+
+        System.out.print("Enter Activity Type: ");
+        String activity = sc.nextLine();
+
+        LogEntry log = new LogEntry(ip, activity);
+        logQueue.add(log);
+        allLogs.add(log);
+
+        System.out.println("Log added successfully");
+    }
+
+    static void detectAttack() {
+        if (logQueue.isEmpty()) {
+            System.out.println("No logs to process");
+            return;
+        }
+
+        LogEntry log = logQueue.poll();
+
+        if (log.activity.equalsIgnoreCase("failed login")
+                || log.activity.equalsIgnoreCase("malware")
+                || log.activity.equalsIgnoreCase("ddos")) {
+
+            suspiciousStack.push(log);
+            blacklistedIPs.add(log.ip);
+            System.out.println("Suspicious activity detected from IP: " + log.ip);
+        } else {
+            System.out.println("Log is safe");
+        }
+    }
+
+    static void viewLogs() {
+        if (logQueue.isEmpty()) {
+            System.out.println("No pending logs");
+            return;
+        }
+
+        for (LogEntry log : logQueue) {
+            System.out.println("IP: " + log.ip + " Activity: " + log.activity);
+        }
+    }
+
+    static void viewSuspicious() {
+        if (suspiciousStack.isEmpty()) {
+            System.out.println("No suspicious activity found");
+            return;
+        }
+
+        for (LogEntry log : suspiciousStack) {
+            System.out.println("IP: " + log.ip + " Activity: " + log.activity);
+        }
+    }
+
+    static void searchIP() {
+        System.out.print("Enter IP to search: ");
+        String ip = sc.nextLine();
+
+        if (blacklistedIPs.contains(ip)) {
+            System.out.println("WARNING: IP is blacklisted due to suspicious activity");
+        } else {
+            System.out.println("IP not found in blacklist");
+        }
+    }
+}
